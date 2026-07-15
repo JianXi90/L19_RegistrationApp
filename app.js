@@ -41,9 +41,23 @@ app.use(flash());
 app.set('view engine', 'ejs');
 
 //******** TODO: Create a Middleware to check if user is logged in. ********//
-
+const checkAuthenticated = (req, res, next) => {
+    if (req.session.user) {
+        return next();
+    } else {
+        req.flash('error', 'Please log in to view this resource');
+        res.redirect('/login');
+    }
+};
 //******** TODO: Create a Middleware to check if user is admin. ********//
-
+const checkAdmin = (req, res, next) => {
+    if (req.session.user.role === 'admin') {
+        return next();
+    } else {
+        req.flash('error', 'Access denied');
+        res.redirect('/dashboard');
+    }
+};
 // Routes
 app.get('/', (req, res) => {
     res.render('index', { user: req.session.user, messages: req.flash('success') });
@@ -122,10 +136,14 @@ app.post('/login', (req, res) => {
     });
 });
 //******** TODO: Insert code for dashboard route to render dashboard page for users. ********//
-
+app.get('/dashboard', checkAuthenticated, (req, res) => {
+    res.render('dashboard', { user: req.session.user });
+});
 //******** TODO: Insert code for admin route to render dashboard page for admin. ********//
+app.get('/admin', checkAuthenticated, checkAdmin, (req, res) => {
+    res.render('admin', { user: req.session.user });
+});
 
-//******** TODO: Insert code for logout route ********//
 //******** TODO: Insert code for logout route ********//
 app.get('/logout', (req, res) => {
     req.session.destroy();
