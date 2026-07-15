@@ -127,7 +127,7 @@ app.post('/login', (req, res) => {
             // Successful login
             req.session.user = results[0]; // store user in session
             req.flash('success', 'Login successful!');
-            res.redirect('/');
+            res.redirect('/dashboard');
         } else {
             // Invalid credentials
             req.flash('error', 'Invalid email or password.');
